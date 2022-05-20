@@ -1,4 +1,3 @@
-import { group } from 'console';
 import React, { Component } from 'react'
 import GroupService from '../services/GroupService';
 class ViewGroupComponent extends Component {

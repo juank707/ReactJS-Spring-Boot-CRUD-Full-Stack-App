@@ -27,11 +27,12 @@ class ListGroupComponent extends Component {
         super(props)
 
     this.state = {
-        groups:[]
+        groups: {}
         }
         this.addGroup = this.addGroup.bin(this);
         this.updateGroup = this.updateGroup.bin(this);
         this.deleteGroup = this.deleteGroup.bin(this);
+        this.viewGroup = this.viewGroup.bin(this);
     }
     componentDidMount(){
        GroupService.getAllGroups().then((res) => {
