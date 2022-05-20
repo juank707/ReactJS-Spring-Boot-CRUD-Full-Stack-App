@@ -18,9 +18,8 @@ import imagenCochinito from '../../img/imagenCochinito.jpg'
 fin de import for dom*/
 
 //import {useAuth0} from '@auth0/auth0-react'
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import GroupService from '../services/GroupService';
-import axios from 'axios'
 
 
 class ListGroupComponent extends Component {
@@ -31,7 +30,7 @@ class ListGroupComponent extends Component {
         groups:[]
         }
         this.addGroup = this.addGroup.bin(this);
-        this.editGroup = this.editGroup.bin(this);
+        this.updateGroup = this.updateGroup.bin(this);
         this.deleteGroup = this.deleteGroup.bin(this);
     }
     componentDidMount(){
@@ -40,161 +39,69 @@ class ListGroupComponent extends Component {
         });
     }
 
-    addGroup(id){
-    this.props.history.push('/addGroup/_add');
+    addGroup(){
+    this.props.history.push(`/add-Group/_add`);
     }
-
+    updateGroup(id){
+        this.props.history.push(`/add-Group/${id}`);
+    }
+    viewGroup(id){
+        this.props.history.push(`/view-group/${id}`)
+    }
+    deleteGroup(userId, groupId){
+        GroupService.deleteGroup(userId, groupId).then( rest => {
+            this.setState({groups: this.state.groups.filter(groups => groups.id !==groupId)});
+        })
+    }
     render() {
         return (
             <div>
-                
+                <h2 className="text-center">Detalles de Grupo</h2>
+                 <div className = "row">
+                    <button className="btn btn-primary" onClick={this.addGroup}> Agregar grupo</button>
+                 </div>
+                 <br></br>
+                 <div className = "row">
+                        <table className = "table table-striped table-bordered">
+
+                            <thead>
+                                <tr>
+                                    <th> Grupo Nombre grupo</th>
+                                    <th> Grupo Fecha Fin</th>
+                                    <th> Grupo Monto Minimo</th>
+                                    <th> Grupo Frecuencia</th>
+                                    <th> Grupo % Interes </th>
+                                    <th> Grupo Lider</th>
+                                    <th> Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    this.state.groups.map(
+                                        group => 
+                                        <tr key = {group.id}>
+                                             <td> {group.groupName} </td>   
+                                             <td> {group.finishDate}</td>
+                                             <td> {group.minimumAmount}</td>
+                                             <td> {group.frequency}</td>
+                                             <td> {group.approvedLoanInterest}</td>
+                                             <td> {group.leaderId}</td>
+                                             <td>
+                                                 <button onClick={ () => this.updateGroup(group.id)} className="btn btn-info">Actualizar </button>
+                                                 <button style={{marginLeft: "10px"}} onClick={ () => this.deleteGroup(group.id)} className="btn btn-danger">Eliminar </button>
+                                                 <button style={{marginLeft: "10px"}} onClick={ () => this.viewGroup(group.id)} className="btn btn-info">Ver </button>
+                                             </td>
+                                        </tr>
+                                    )
+                                }
+                            </tbody>
+                        </table>
+
+                 </div>
+
             </div>
         );
     }
 }
 
-/*class CreateGroup extends Component {
-    
-    constructor(props){
-        super(props)
-       
-        const {user, isAuthenticated, isLoading} = useAuth0();
-
-        this.state = {
-            id: this.props.match.params.id,
-            groupName: '',
-            finishDate: '',
-            minimumAmount: '',
-            frequency: '',
-            approvedLoanInterest: '',
-            leaderId: ''
-        }
-        this.changeGroupName = this.changeGroupName.bind(this);
-        this.changeFinishDate = this.changeFinishDate.bind(this);
-        this.changeMinimumAmount = this.changeMinimumAmount.bind(this);
-        this.changeFrequency = this.changeFrequency.bind(this);
-        this.changeApprovedLoanInterest = this.changeApprovedLoanInterest.bind(this);
-        this.saveOrUpdateGroup = this.saveOrUpdateGroup.bind(this);
-    }
-    componentDidMount(){
-        if(this.state.id === '_add'){
-            return
-        }else{
-            GroupService.getGroupById(this.state.id).then ((res)=> {
-                let group = res.data;
-                //let user = res.data;
-                this.setState({groupName group.groupName, 
-                    finishDate group.finishDate, 
-                    minimumAmount group.minimumAmount, 
-                    frequency group.frequency, 
-                    approvedLoanInterest group.approvedLoanInterest, 
-                    leaderId group.leaderId
-                })
-            });
-    }
-}
-    saveOrUpdateGroup = (g) => {
-        g.preventDefault();
-        let group = {groupName: this.state.groupName,
-            finishDate: this.state.finishDate,
-            minimumAmount: this.state.minimumAmount,
-            frequency: this.state.frequency,
-            approvedLoanInterest: this.state.approvedLoanInterest};
-            console.log('group => ' + JSON.stringify(group));
-
-        if (this.state.id === '_add') {
-            GroupService.createGroup(group).then(res =>{
-                this.props.history.push('/groups');
-            });
-        }else{
-            GroupService.updateGroup(group,this.state.id).then(res =>{
-                this.props.history.push('/groups');
-            });
-        }
-            
-    }
-
-    changeGroupName = (event) =>{
-        this.setState({groupName: event.target.value});
-
-    }
-    changeFinishDate = (event) => {
-        this.setState({finishDate: event.target.value});
-    }
-    changeMinimumAmount = (event) => {
-        this.setState({minimumAmount: event.target.value});
-     }
-    changeFrequency = (event) => {
-        this.setState({frequency: event.target.value});
-    }
-    changeApprovedLoanInterest = (event) =>{
-        this.setState({approvedLoanInterest: event.target.value});
-    }
-         getTitle(){
-             if (this.state.id === '_add') {
-                 return <h3 className='text-center'>Crear Grupo</h3>;
-                 
-             }else{
-                 return <h3 className='text-center'>Actualizar Grupo</h3>;
-             }
-         }
-
-        cancel(){
-            this.props.history.push('/groups');
-        }
-
-        
-    render() {
-        return (
-            <div>
-                <br></br>
-                   <div className = "container">
-                        <div className = "row">
-                            <div className = "card col-md-6 offset-md-3 offset-md-3">
-                                {
-                                    this.getTitle()
-                                }
-                            <div className = "card-body">
-                                    <form>
-                                        <div className = "form-group">
-                                            <label> Nombre del Grupo: </label>
-                                            <input placeholder="Nombre del Grupo" name="groupName" className="form-control" 
-                                                value={this.state.groupName} onChange={this.changeGroupName}/>
-                                        </div>
-                                        <div className = "form-group">
-                                            <label> Fecha de cierre Grupo: </label>
-                                            <input type="text" placeholder="MM/DD/YYYY" name="finishDate" className="form-control" 
-                                                value={this.state.finishDate} onChange={this.changeFinishDate} onfocus="(this.type='date')"/>
-                                        </div>
-                                        <div className = "form-group">
-                                            <label> Monto minimo: </label>
-                                            <input placeholder="$" name="minimumAmount" className="form-control" 
-                                                value={this.state.minimumAmount} onChange={this.changeGroupName}/>
-                                        </div>
-                                        <div className = "form-group">
-                                            <label> Frecuencia: </label>
-                                            <select
-                                                 placeholder="selecione" name="frequency" className="form-control" 
-                                                value={this.state.frequency} onChange={this.changeFrequency} />
-                                        </div>
-                                        <div className = "form-group">
-                                            <label> monto aprovado </label>
-                                            <input placeholder="$" name="approvedLoanInterest" className="form-control" 
-                                                value={this.state.approvedLoanInterest} onChange={this.changeApprovedLoanInterest}/>
-                                        </div>
-                                        <button className="btn btn-success" onClick={this.saveOrUpdateGroup}>Save</button>
-                                        <button className="btn btn-danger" onClick={this.cancel.bind(this)} style={{marginLeft: "10px"}}>Cancel</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-
-                   </div>
-            </div>
-        
-        ); 
-    }
-}
-
-*/
 export default ListGroupComponent;

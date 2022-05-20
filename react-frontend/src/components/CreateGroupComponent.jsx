@@ -35,8 +35,7 @@ class CreateGroupComponent extends Component {
             finishDate: '',
             minimumAmount: '',
             frequency: '',
-            approvedLoanInterest: '',
-            leaderId: ''
+            approvedLoanInterest: ''
         }
         this.changeGroupName = this.changeGroupName.bind(this);
         this.changeFinishDate = this.changeFinishDate.bind(this);
